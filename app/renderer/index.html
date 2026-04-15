@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>License Scanner</title>
+  <!-- styles injected by build -->
+</head>
+<body>
+
+  <header>
+    <h1>License Scanner</h1>
+    <p class="subtitle">Scan or paste barcode data below — fields will populate automatically</p>
+  </header>
+
+  <main>
+    <section class="scan-section">
+      <label for="scan-input">Barcode Input</label>
+      <textarea
+        id="scan-input"
+        placeholder="Place cursor here, then scan the back of the license with a barcode scanner — or paste raw data manually."
+        spellcheck="false"
+        autocomplete="off"
+      ></textarea>
+      <div class="scan-actions">
+        <button id="btn-parse" class="btn-primary">Parse</button>
+        <button id="btn-clear" class="btn-secondary">Clear All</button>
+        <span id="status-badge" class="badge hidden"></span>
+      </div>
+    </section>
+
+    <section class="results-section">
+      <div class="results-header">
+        <h2>Parsed Fields</h2>
+        <button id="btn-copy-all" class="btn-secondary" disabled>Copy All as Text</button>
+      </div>
+      <div class="field-grid" id="field-grid"></div>
+    </section>
+  </main>
+
+  <!-- script injected by build -->
+</body>
+</html>
