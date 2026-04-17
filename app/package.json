@@ -2,14 +2,16 @@
   "name": "license-scanner",
   "version": "1.0.0",
   "description": "Scan driver's license barcodes and copy parsed fields into authorization systems",
+  "main": "main.js",
   "scripts": {
-    "build": "node build.js",
-    "open": "node build.js && start dist/index.html"
+    "start": "electron .",
+    "build": "node build.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "^0.28.0"
+    "esbuild": "^0.28.0",
+    "electron": "^33.0.0"
   },
   "dependencies": {
     "aamva-parser": "^1.6.0"

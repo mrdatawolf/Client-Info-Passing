@@ -2,20 +2,43 @@
 
 Scan a driver's license barcode → parse AAMVA fields → copy into any authorization system.
 
-No server. No install. Single HTML file output.
+Packaged as an Electron desktop app. No server, no browser, no keyboard-shortcut interference.
 
 ---
 
 ## How it works
 
 ```
-app/renderer/index.html  ─┐
-app/renderer/styles.css   ├─► build.js (esbuild) ─► dist/index.html
-app/src/app.js            ┘         ↑
-  + aamva-parser (npm)          node_modules
+[USB barcode scanner]
+        │
+        │  HID keyboard stream
+        ▼
+  Electron main process
+  (before-input-event)
+        │
+        │  Buffers characters, sends complete scan via IPC
+        ▼
+  Renderer (renderer.js)
+        │
+        │  window.aamva.parse()  ←── preload.js (aamva-parser, Node context)
+        ▼
+  Parsed field grid
+        │
+  [Copy] per field  |  [Copy All as Text]
 ```
 
-The build bundles everything (JS + CSS) inline into one self-contained `dist/index.html`.
+The main process intercepts every keystroke from the scanner before Chromium sees it, so AAMVA control characters (`\x1e`, `@`, etc.) never reach the browser engine and cannot trigger shortcuts or navigation.
+
+---
+
+## Supported formats
+
+Both formats encode the same AAMVA standard fields and are auto-detected on scan:
+
+| Format | First character | Notes |
+|---|---|---|
+| PDF417 Barcode | `@` | Older CA licenses; ends with `zczc` |
+| QR Code | `2` (or non-`@`) | Newer CA licenses; mixed-case field IDs |
 
 ---
 
@@ -24,25 +47,20 @@ The build bundles everything (JS + CSS) inline into one self-contained `dist/ind
 ```bash
 cd app
 npm install
-npm run build        # outputs dist/index.html
-npm run open         # build + open in browser (Windows)
+npm start
 ```
+
+`npm start` launches the Electron app directly. No build step required to run.
 
 ---
 
 ## Usage
 
-```
-[Barcode scanner] → textarea → auto-parse on Enter / focus-out
-                                        ↓
-                              Parsed field grid
-                                        ↓
-                        [Copy] per field  |  [Copy All as Text]
-```
-
-- Paste raw PDF417 barcode data or use a physical USB barcode scanner
+- Point a USB barcode scanner at the back of a driver's license and scan
+- Fields populate automatically — no button press needed
+- Paste raw AAMVA data manually (Ctrl+V → Enter) for testing
 - Expired licenses show a warning banner
-- No data leaves the browser
+- No data leaves the machine
 
 ---
 
@@ -50,14 +68,20 @@ npm run open         # build + open in browser (Windows)
 
 ```
 app/
-  src/app.js          entry point — parse + UI logic
+  main.js             Electron main process — scanner input capture, IPC
+  preload.js          contextBridge — exposes window.aamva and window.scanner
   renderer/
-    index.html        HTML shell (placeholders for injected CSS/JS)
-    styles.css        styles
-  build.js            esbuild bundler script
+    index.html        App shell
+    styles.css        Styles
+    renderer.js       UI logic — receives scan via IPC, parses and displays
+  build.js            esbuild script (generates standalone dist/index.html)
   package.json
   dist/               ← generated, not tracked
   node_modules/       ← generated, not tracked
+Sample/
+  raw_barcode.txt     Example raw PDF417 scan output
+  raw_qr.txt          Example raw QR scan output
+  example.txt         Pre-formatted AAMVA reference data
 ```
 
 ---
@@ -66,5 +90,6 @@ app/
 
 | Package | Purpose |
 |---|---|
-| [aamva-parser](https://github.com/winfinit/aamva-parser) | Decode AAMVA PDF417 barcode data |
-| [esbuild](https://esbuild.github.io/) | Bundle + inline JS for distribution |
+| [electron](https://www.electronjs.org/) | Desktop app shell; keyboard input interception |
+| [aamva-parser](https://github.com/winfinit/aamva-parser) | Decode AAMVA barcode data |
+| [esbuild](https://esbuild.github.io/) | Optional: bundle into standalone HTML for browser testing |

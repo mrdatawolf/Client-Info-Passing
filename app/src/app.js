@@ -74,6 +74,14 @@ function buildGrid() {
   });
 }
 
+// ── Format detection ──────────────────────────────────────────────────────
+function detectScanFormat(raw) {
+  const first = raw.trimStart()[0];
+  if (first === '@') return 'PDF417 Barcode';
+  if (/^ANSI\s/i.test(raw.trim())) return 'Standard';
+  return 'QR Code';
+}
+
 // ── Parse helpers ─────────────────────────────────────────────────────────
 const fmt = (d) => (d instanceof Date && !isNaN(d) ? d.toLocaleDateString('en-US') : null);
 
@@ -106,11 +114,12 @@ function parseAndDisplay() {
   const raw = scanInput.value.trim();
   if (!raw) return;
 
+  const format = detectScanFormat(raw);
   let data;
   try {
     data = parseLicense(raw);
   } catch (err) {
-    showBadge('error', '✗  ' + (err.message || 'Could not parse barcode'));
+    showBadge('error', `✗  ${format} — ${err.message || 'Could not parse'}`);
     return;
   }
 
@@ -133,10 +142,10 @@ function parseAndDisplay() {
   const warningEl = document.getElementById('expired-warning');
   if (data.expired) {
     warningEl.classList.add('visible');
-    showBadge('expired', '⚠  License Expired');
+    showBadge('expired', `⚠  ${format} — License Expired`);
   } else {
     warningEl.classList.remove('visible');
-    showBadge('success', '✓  Parsed successfully');
+    showBadge('success', `✓  ${format} — Parsed successfully`);
   }
 
   btnCopyAll.disabled = false;
