@@ -114,6 +114,11 @@ function parseAndDisplay() {
   const raw = scanInput.value.trim();
   if (!raw) return;
 
+  showBadge('processing', ' Processing…');
+  requestAnimationFrame(() => setTimeout(() => _finishParse(raw), 0));
+}
+
+function _finishParse(raw) {
   const format = detectScanFormat(raw);
   let data;
   try {
