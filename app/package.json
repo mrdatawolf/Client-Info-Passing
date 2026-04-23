@@ -1,7 +1,7 @@
 {
   "name": "license-scanner",
-  "version": "1.0.0",
-  "description": "Scan driver's license barcodes and copy parsed fields into authorization systems",
+  "version": "1.0.5",
+  "description": "Scan driver's license barcodes and allows copying of parsed fields into authorization systems",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -13,12 +13,14 @@
   "build": {
     "appId": "com.trustbiztech.license-scanner",
     "productName": "License Scanner",
+    "icon": "wolflicense.ico",
     "directories": {
       "output": "dist"
     },
     "files": [
       "main.js",
       "preload.js",
+      "wolflicense.ico",
       "renderer/**/*",
       "node_modules/**/*",
       "!dist/**/*",
