@@ -101,6 +101,9 @@ contextBridge.exposeInMainWorld('aamva', {
 });
 
 contextBridge.exposeInMainWorld('scanner', {
+  onScanStart(callback) {
+    ipcRenderer.on('scan-start', () => callback());
+  },
   onScan(callback) {
     ipcRenderer.on('scan-complete', (_event, data) => callback(data));
   },

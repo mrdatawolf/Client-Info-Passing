@@ -81,6 +81,7 @@ function createWindow() {
     // Printable character
     if (input.key.length === 1) {
       event.preventDefault();
+      if (scanBuffer.length === 0) win.webContents.send('scan-start');
       scanBuffer += input.key;
       clearTimeout(scanTimer);
       scanTimer = setTimeout(flushScan, 200);

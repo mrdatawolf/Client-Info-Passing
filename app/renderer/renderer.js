@@ -89,6 +89,11 @@ function parseAndDisplay() {
   const raw = scanInput.value.trim();
   if (!raw) return;
 
+  showBadge('processing', ' Processing…');
+  requestAnimationFrame(() => setTimeout(() => _finishParse(raw), 0));
+}
+
+function _finishParse(raw) {
   const format = detectScanFormat(raw);
 
   let result;
@@ -111,7 +116,7 @@ function parseAndDisplay() {
     firstName:      d.firstName         ?? null,
     lastName:       d.lastName          ?? null,
     middleName:     d.middleName        ?? null,
-    dateOfBirth:    fmt(d.dateOfBirth),    // ISO string from preload
+    dateOfBirth:    fmt(d.dateOfBirth),
     expirationDate: fmt(d.expirationDate),
     issueDate:      fmt(d.issueDate),
     streetAddress:  d.streetAddress     ?? null,
@@ -196,6 +201,10 @@ function showBadge(type, text) {
 }
 
 // ── Scanner input via IPC (main process buffers + sends complete scan) ───
+window.scanner.onScanStart(() => {
+  showBadge('processing', ' Scanning…');
+});
+
 window.scanner.onScan((raw) => {
   scanInput.value = raw;
   parseAndDisplay();
