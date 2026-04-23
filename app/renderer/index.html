@@ -9,8 +9,11 @@
 <body>
 
   <header>
-    <h1>License Scanner</h1>
-    <p class="subtitle">Scan or paste barcode data below — fields will populate automatically</p>
+    <img src="icon.png" alt="" class="header-icon" />
+    <div>
+      <h1>License Scanner</h1>
+      <p class="subtitle">Scan or paste barcode data below — fields will populate automatically</p>
+    </div>
   </header>
 
   <main>
@@ -18,7 +21,7 @@
       <label for="scan-input">Barcode Input</label>
       <textarea
         id="scan-input"
-        placeholder="Place cursor here, then scan the back of the license with a barcode scanner — or paste raw data manually."
+        placeholder="Click this box, then scan the back of the license with the barcode scanner."
         spellcheck="false"
         autocomplete="off"
       ></textarea>
@@ -32,7 +35,7 @@
     <section class="results-section">
       <div class="results-header">
         <h2>Parsed Fields</h2>
-        <button id="btn-copy-all" class="btn-secondary" disabled>Copy All as Text</button>
+        <button id="btn-copy-all" class="btn-secondary" disabled hidden>Copy All as Text</button>
       </div>
       <div class="field-grid" id="field-grid"></div>
     </section>

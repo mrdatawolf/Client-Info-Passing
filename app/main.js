@@ -5,11 +5,12 @@ const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 960,
+    width: 1920,
     height: 800,
-    minWidth: 600,
+    minWidth: 1200,
     minHeight: 500,
     title: 'License Scanner',
+    icon: path.join(__dirname, 'wolflicense.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
