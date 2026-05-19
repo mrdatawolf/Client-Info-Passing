@@ -5,9 +5,9 @@ const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1920,
-    height: 800,
-    minWidth: 1200,
+    width: 520,
+    height: 840,
+    minWidth: 480,
     minHeight: 500,
     title: 'License Scanner',
     icon: path.join(__dirname, 'wolflicense.ico'),

@@ -6,3 +6,5 @@ app/dist/
 # Dependencies
 app/node_modules/
 app/package-lock.json
+
+Samples/

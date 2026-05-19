@@ -9,6 +9,7 @@
 <body>
 
   <header>
+    <button id="btn-toggle-panel" class="btn-toggle-panel" title="Toggle scan panel"></button>
     <img src="icon.png" alt="" class="header-icon" />
     <div>
       <h1>License Scanner</h1>
@@ -17,7 +18,8 @@
   </header>
 
   <main>
-    <section class="scan-section">
+
+    <section class="scan-section" id="scan-panel">
       <label for="scan-input">Barcode Input</label>
       <textarea
         id="scan-input"
@@ -39,6 +41,8 @@
       </div>
       <div class="field-grid" id="field-grid"></div>
     </section>
+
+    <div id="scan-overlay" class="scan-overlay hidden"></div>
   </main>
 
   <script src="renderer.js"></script>

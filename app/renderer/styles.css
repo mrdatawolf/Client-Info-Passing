@@ -26,6 +26,11 @@
   --shadow-lg:     0 8px 32px rgba(0,0,0,.35);
 }
 
+html, body {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
@@ -40,10 +45,10 @@ header {
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
   border-bottom: 1px solid #312e81;
   color: #fff;
-  padding: 14px 32px;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 .header-icon {
   width: 40px;
@@ -55,7 +60,7 @@ header h1 { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
 .subtitle  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
 /* ── Main layout ── */
-main { max-width: 1720px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: row; align-items: stretch; gap: 16px; }
+main { width: min(100%, 1100px); max-width: 1100px; margin: 24px auto; padding: 0 20px; display: flex; flex-direction: row; align-items: stretch; gap: 16px; position: relative; }
 
 /* ── Sections ── */
 .scan-section,
@@ -67,7 +72,31 @@ main { max-width: 1720px; margin: 24px auto; padding: 0 20px; display: flex; fle
   padding: 20px 24px;
 }
 
-.scan-section    { flex: 0 0 420px; display: flex; flex-direction: column; }
+.scan-section {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: clamp(280px, 24vw, 420px);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transform: translateX(-100%);
+  transition: transform .3s ease-in-out;
+  z-index: 1000;
+  border-radius: 0;
+  border: none;
+  border-right: 1px solid var(--border);
+  box-shadow: 2px 0 8px rgba(0,0,0,.3);
+  overflow-y: auto;
+  padding-top: 80px;
+}
+
+.scan-section.open {
+  transform: translateX(0);
+}
+
 .results-section { flex: 1; min-width: 0; }
 
 /* ── Section headings ── */
@@ -151,6 +180,33 @@ button:active:not(:disabled) { transform: translateY(1px); }
 
 button:disabled { opacity: .35; cursor: default; }
 
+/* ── Toggle panel button ── */
+.btn-toggle-panel {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, transform .1s;
+  font-size: 20px;
+  line-height: 1;
+}
+.btn-toggle-panel:hover {
+  background: var(--primary-h);
+}
+.btn-toggle-panel:active {
+  transform: translateY(1px);
+}
+.btn-toggle-panel::before {
+  content: '☰';
+}
+
 /* ── Status badge ── */
 .badge {
   display: inline-flex;
@@ -193,8 +249,8 @@ button:disabled { opacity: .35; cursor: default; }
 /* ── Field grid ── */
 .field-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: 4px;
 }
 
 @media (max-width: 600px) {
@@ -207,7 +263,7 @@ button:disabled { opacity: .35; cursor: default; }
   flex-direction: row;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 3px 6px;
   border-radius: var(--radius-sm);
   transition: background .15s;
 }
@@ -284,3 +340,25 @@ button:disabled { opacity: .35; cursor: default; }
   display: none;
 }
 .expired-warning.visible { display: block; }
+
+/* ── Scan overlay ── */
+.scan-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.scan-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.scan-overlay.hidden {
+  display: none;
+}

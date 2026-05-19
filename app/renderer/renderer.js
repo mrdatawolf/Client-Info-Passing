@@ -1,22 +1,18 @@
 'use strict';
 
 const FIELDS = [
-  { key: 'licenseNumber',  label: 'License Number',  fullWidth: true },
-  { key: 'lastName',       label: 'Last Name' },
   { key: 'firstName',      label: 'First Name' },
   { key: 'middleName',     label: 'Middle Name' },
-  { key: 'dateOfBirth',    label: 'Date of Birth' },
-  { key: 'expirationDate', label: 'Expiration Date' },
-  { key: 'issueDate',      label: 'Issue Date' },
-  { key: 'streetAddress',  label: 'Street Address',  fullWidth: true },
-  { key: 'city',           label: 'City' },
-  { key: 'state',          label: 'State' },
+  { key: 'lastName',       label: 'Last Name' },
+  { key: 'streetAddress',  label: 'Street Address' },
   { key: 'postalCode',     label: 'Zip Code' },
   { key: 'gender',         label: 'Gender' },
-  { key: 'eyeColor',       label: 'Eye Color' },
   { key: 'hairColor',      label: 'Hair Color' },
+  { key: 'eyeColor',       label: 'Eye Color' },
   { key: 'height',         label: 'Height' },
   { key: 'weight',         label: 'Weight' },
+  { key: 'dateOfBirth',    label: 'Date of Birth' },
+  { key: 'licenseNumber',  label: 'ID Number' },
   { key: 'country',        label: 'Country' },
 ];
 
@@ -26,6 +22,8 @@ const btnClear    = document.getElementById('btn-clear');
 const btnCopyAll  = document.getElementById('btn-copy-all');
 const statusBadge = document.getElementById('status-badge');
 const fieldGrid   = document.getElementById('field-grid');
+const scanPanel   = document.getElementById('scan-panel');
+const btnToggle   = document.getElementById('btn-toggle-panel');
 
 const valueEls = {};
 const copyBtns = {};
@@ -112,22 +110,18 @@ function _finishParse(raw) {
   const d = result.data;
 
   const mapped = {
-    licenseNumber:  d.driversLicenseId  ?? null,
     firstName:      d.firstName         ?? null,
-    lastName:       d.lastName          ?? null,
     middleName:     d.middleName        ?? null,
-    dateOfBirth:    fmt(d.dateOfBirth),
-    expirationDate: fmt(d.expirationDate),
-    issueDate:      fmt(d.issueDate),
+    lastName:       d.lastName          ?? null,
     streetAddress:  d.streetAddress     ?? null,
-    city:           d.city              ?? null,
-    state:          d.state             ?? null,
     postalCode:     d.postalCode        ?? null,
-    eyeColor:       d.eyeColor          ?? null,
+    gender:         d.gender            ?? null,
     hairColor:      d.hairColor         ?? null,
+    eyeColor:       d.eyeColor          ?? null,
     height:         d.height != null ? String(d.height) : null,
     weight:         d.weight            ?? null,
-    gender:         d.gender            ?? null,
+    dateOfBirth:    fmt(d.dateOfBirth),
+    licenseNumber:  d.driversLicenseId  ?? null,
     country:        d.country           ?? null,
   };
 
@@ -223,9 +217,26 @@ scanInput.addEventListener('input', () => {
   }, 200);
 });
 
+function openScanPanel() {
+  scanPanel.classList.add('open');
+  btnToggle.disabled = true;
+}
+
+function closeScanPanel() {
+  scanPanel.classList.remove('open');
+  btnToggle.disabled = false;
+}
+
 btnParse.addEventListener('click', parseAndDisplay);
 btnClear.addEventListener('click', clearAll);
 btnCopyAll.addEventListener('click', copyAll);
+btnToggle.addEventListener('click', openScanPanel);
+
+document.addEventListener('click', (event) => {
+  if (!scanPanel.classList.contains('open')) return;
+  if (scanPanel.contains(event.target) || btnToggle.contains(event.target)) return;
+  closeScanPanel();
+});
 
 buildGrid();
 scanInput.focus();
