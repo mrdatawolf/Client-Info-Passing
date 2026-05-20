@@ -1,48 +1,29 @@
 # License Scanner
 
-Scan a driver's license barcode → parse AAMVA fields → copy into any authorization system.
+Electron desktop app for scanning driver's license barcodes and parsing AAMVA fields locally.
 
-Packaged as an Electron desktop app. No server, no browser, no keyboard-shortcut interference.
-
----
-
-## How it works
-
-```
-[USB barcode scanner]
-        │
-        │  HID keyboard stream
-        ▼
-  Electron main process
-  (before-input-event)
-        │
-        │  Buffers characters, sends complete scan via IPC
-        ▼
-  Renderer (renderer.js)
-        │
-        │  window.aamva.parse()  ←── preload.js (aamva-parser, Node context)
-        ▼
-  Parsed field grid
-        │
-  [Copy] per field  |  [Copy All as Text]
-```
-
-The main process intercepts every keystroke from the scanner before Chromium sees it, so AAMVA control characters (`\x1e`, `@`, etc.) never reach the browser engine and cannot trigger shortcuts or navigation.
+This repository contains a small offline tool that intercepts HID keyboard input from USB barcode scanners, decodes PDF417 and QR license payloads, and displays parsed fields for one-click copy.
 
 ---
 
-## Supported formats
+## Features
 
-Both formats encode the same AAMVA standard fields and are auto-detected on scan:
-
-| Format | First character | Notes |
-|---|---|---|
-| PDF417 Barcode | `@` | Older CA licenses; ends with `zczc` |
-| QR Code | `2` (or non-`@`) | Newer CA licenses; mixed-case field IDs |
+- Offline Electron application with no network dependencies
+- Supports both PDF417 and QR-coded driver's license scans
+- Parses AAMVA standard fields and shows results in a field grid
+- Copy single fields or copy all parsed data as plain text
+- Prevents scanner control characters from triggering browser shortcuts
+- Works with USB barcode scanners that emulate keyboard input
 
 ---
 
-## Quickstart
+## Why this repo
+
+Many authorization and intake systems still require manual entry of driver's license data. This app streamlines the process by converting raw license barcode scans into structured form fields without sending any data outside the local machine.
+
+---
+
+## Quick start
 
 ```bash
 cd app
@@ -50,46 +31,112 @@ npm install
 npm start
 ```
 
-`npm start` launches the Electron app directly. No build step required to run.
+- `npm install` installs runtime dependencies
+- `npm start` launches the Electron app
+
+---
+
+## Build / Package
+
+From the `app` folder:
+
+```bash
+npm run build
+npm run dist
+```
+
+- `npm run build` bundles the app assets with `esbuild`
+- `npm run dist` packages a portable Windows bundle using `electron-builder`
+
+There is also a top-level `build-portable.bat` helper for Windows packaging.
+
+---
+
+## Supported input formats
+
+This app auto-detects the AAMVA payload format from raw scanner input.
+
+| Format | Indicator | Notes |
+|---|---|---|
+| PDF417 barcode | `@` | Older California/US licenses; data ends with `zczc` |
+| QR code | typically `2` or other non-`@` prefix | Newer licenses with mixed-case AAMVA field IDs |
+
+---
+
+## How it works
+
+```text
+[USB barcode scanner]
+        │
+        │  HID keyboard stream
+        ▼
+Electron main process
+  (before-input-event)
+        │
+        │  Buffers scanner characters, then sends complete scan via IPC
+        ▼
+Renderer (renderer.js)
+        │
+        │  window.aamva.parse()  ←── preload.js (aamva-parser, Node context)
+        ▼
+Parsed field grid and copy controls
+```
+
+The main process captures each keystroke before Chromium processes it, so AAMVA control characters like `\x1e` and `@` do not trigger browser shortcuts or text input events.
 
 ---
 
 ## Usage
 
-- Point a USB barcode scanner at the back of a driver's license and scan
-- Fields populate automatically — no button press needed
-- Paste raw AAMVA data manually (Ctrl+V → Enter) for testing
-- Expired licenses show a warning banner
-- No data leaves the machine
+- Plug in a USB barcode scanner that emulates keyboard input
+- Scan the driver's license barcode or QR code
+- Parsed fields appear automatically in the UI
+- Use the copy buttons to transfer individual values or copy all parsed output
+- Paste raw AAMVA strings manually for testing if needed
 
 ---
 
-## Project layout
+## Example screenshot
+
+The app displays parsed license fields in a simple grid with copy controls for each field and a global "Copy All" option. This makes it easy to paste scanned data directly into authorization systems, ID verification forms, or intake tools.
+
+> Note: `Samples/Media.jpeg` contains an example scan image and sample workflow reference.
+
+---
+
+## Repository layout
 
 ```
 app/
-  main.js             Electron main process — scanner input capture, IPC
-  preload.js          contextBridge — exposes window.aamva and window.scanner
+  main.js
+  preload.js
   renderer/
-    index.html        App shell
-    styles.css        Styles
-    renderer.js       UI logic — receives scan via IPC, parses and displays
-  build.js            esbuild script (generates standalone dist/index.html)
+    index.html
+    renderer.js
+    styles.css
+  build.js
   package.json
-  dist/               ← generated, not tracked
-  node_modules/       ← generated, not tracked
-Sample/
-  raw_barcode.txt     Example raw PDF417 scan output
-  raw_qr.txt          Example raw QR scan output
-  example.txt         Pre-formatted AAMVA reference data
+  dist/            ← generated output
+  node_modules/    ← generated dependencies
+Samples/
+  Media.jpeg
+  order.txt
+build-portable.bat
+LICENSE
+README.md
 ```
 
 ---
 
 ## Dependencies
 
-| Package | Purpose |
-|---|---|
-| [electron](https://www.electronjs.org/) | Desktop app shell; keyboard input interception |
-| [aamva-parser](https://github.com/winfinit/aamva-parser) | Decode AAMVA barcode data |
-| [esbuild](https://esbuild.github.io/) | Optional: bundle into standalone HTML for browser testing |
+- `electron` — desktop shell and input interception
+- `aamva-parser` — AAMVA barcode payload decoding
+- `esbuild` — optional bundling for standalone HTML output
+- `electron-builder` — packaging portable Windows builds
+
+---
+
+## License
+
+This project is licensed under the ISC License.
